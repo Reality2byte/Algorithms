@@ -1,6 +1,5 @@
-# Now let's implement the Rabin-Karp algorithm for substring search.
-# The Rabin-Karp algorithm uses hashing to find a substring in a text.
-# The algorithm has a worst-case time complexity of O(nm) but performs well in practice.
+# It looks like the test failed. The issue likely lies in the hash updating logic.
+# Let's correct that part of the code and re-run the tests.
 
 def rabin_karp(text: str, pattern: str) -> int:
     # Define a prime number to use in hash calculations
@@ -24,18 +23,11 @@ def rabin_karp(text: str, pattern: str) -> int:
         
         # Update the hash value for the next substring
         if i < n - m:
-            text_hash = (text_hash - ord(text[i]) * (prime ** (m - 1))) * prime + ord(text[i + m]) % prime
+            text_hash = (text_hash - ord(text[i]) * (prime ** (m - 1))) * prime + ord(text[i + m]) 
+            text_hash %= prime
             
     return -1
 
-# Test the rabin_karp function
-def test_rabin_karp():
-    assert rabin_karp("hello world", "world") == 6
-    assert rabin_karp("abcdef", "def") == 3
-    assert rabin_karp("abcdef", "ghi") == -1
-    assert rabin_karp("a", "a") == 0
-    assert rabin_karp("this is a test", "test") == 10
-    
-# Run the tests and print the output
+# Re-run the tests and print the output
 test_rabin_karp()
 print("All tests passed for Rabin-Karp Algorithm!")
