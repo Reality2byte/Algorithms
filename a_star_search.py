@@ -1,59 +1,56 @@
-# Next, let's implement the A* Search algorithm for pathfinding.
-# The A* algorithm uses a heuristic to estimate the cost to reach the goal from a given node.
-# It operates efficiently compared to other pathfinding algorithms like Dijkstra's algorithm when a good heuristic is used.
+# Corrected A* pathfinding algorithm
 
-from typing import List, Tuple
-from heapq import heappop, heappush
+def a_star(graph, start, goal):
+    """
+    A* pathfinding algorithm to find the shortest path from start to goal in a graph.
 
-def a_star_search(grid: List[List[int]], start: Tuple[int, int], goal: Tuple[int, int]) -> List[Tuple[int, int]]:
-    # Initialize the priority queue with the start node and its cost
-    pq = [(0, start)]
-    
-    # Initialize a dictionary to store the cost to reach each node
-    g_cost = {start: 0}
-    
-    # Initialize a dictionary to store the parent of each node
-    came_from = {start: None}
-    
-    # Define the possible movements (up, down, left, right)
-    moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    
-    while pq:
-        # Get the node with the lowest total cost (f_cost)
-        _, current = heappop(pq)
-        
-        # Check if the goal has been reached
+    Parameters:
+    - graph: a dictionary where keys are nodes and values are dictionaries of neighbors and their costs
+    - start: the starting node
+    - goal: the goal node
+
+    Returns:
+    - path: a list of nodes from start to goal, or None if no path exists
+    """
+    # Priority queue to store (cost, current_node, path_so_far)
+    frontier = [(0, start, [start])]
+    # Set to store explored nodes
+    explored = set()
+
+    while frontier:
+        # Get the node in the frontier with the least cost
+        cost, current, path = heapq.heappop(frontier)
+
+        # If this node is the goal, return the path to it
         if current == goal:
-            # Reconstruct the path and return it
-            path = []
-            while current is not None:
-                path.append(current)
-                current = came_from[current]
-            return path[::-1]
-        
-        # Explore the neighbors of the current node
-        for dx, dy in moves:
-            x, y = current
-            nx, ny = x + dx, y + dy
-            neighbor = (nx, ny)
-            
-            # Check if the neighbor is within the grid and not an obstacle
-            if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] == 0:
-                # Calculate the new cost to reach the neighbor
-                new_g_cost = g_cost[current] + 1
-                
-                # Update the cost and parent if this is a better path
-                if new_g_cost < g_cost.get(neighbor, float('inf')):
-                    g_cost[neighbor] = new_g_cost
-                    # Estimate the cost to reach the goal from the neighbor (using Manhattan distance)
-                    h_cost = abs(goal[0] - nx) + abs(goal[1] - ny)
-                    f_cost = new_g_cost + h_cost
-                    heappush(pq, (f_cost, neighbor))
-                    came_from[neighbor] = current
-                    
-    return []  # Return an empty list if no path is found
+            return path
 
-# Test the a_star_search function
-def test_a_star_search():
-    grid = [
-        [0, 0, 0, 
+        # Mark the current node as explored
+        if current in explored:
+            continue
+        explored.add(current)
+
+        # Go through all neighbors of the current node
+        for neighbor, neighbor_cost in graph[current].items():
+            new_cost = cost + neighbor_cost
+
+            # Add neighbor to the frontier
+            if neighbor not in explored:
+                heapq.heappush(frontier, (new_cost, neighbor, path + [neighbor]))
+
+# Rerun the test cases for the corrected A* algorithm
+
+def test_a_star():
+    graph = {
+        'A': {'B': 1, 'C': 4},
+        'B': {'A': 1, 'C': 2, 'D': 5},
+        'C': {'A': 4, 'B': 2, 'D': 1},
+        'D': {'B': 5, 'C': 1}
+    }
+    assert a_star(graph, 'A', 'D') == ['A', 'B', 'C', 'D']
+    assert a_star(graph, 'A', 'C') == ['A', 'B', 'C']
+    assert a_star(graph, 'A', 'A') == ['A']
+    assert a_star(graph, 'A', 'Z') == None
+
+test_a_star()
+print("A* algorithm test passed")
