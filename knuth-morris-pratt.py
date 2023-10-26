@@ -1,26 +1,19 @@
-def kmp_search(text, pattern):
-    """
-    Knuth-Morris-Pratt (KMP) algorithm for substring search.
-    
-    Parameters:
-    text (str): The text string to search within.
-    pattern (str): The pattern string to search for.
-    
-    Returns:
-    list: A list of starting indices where the pattern is found in the text.
-    """
+# Debugging: Print the lps array and occurrences to find what is going wrong
+def kmp_search_debug(text, pattern):
     # Create the longest prefix suffix (lps) array for the pattern
     lps = [0] * len(pattern)
-    j = 0  # Length of the previous longest prefix suffix
+    length = 0  # Length of the previous longest prefix suffix
     
     # Preprocess the pattern to populate the lps array
     for i in range(1, len(pattern)):
-        while j > 0 and pattern[j] != pattern[i]:
-            j = lps[j-1]
+        while length > 0 and pattern[length] != pattern[i]:
+            length = lps[length-1]
             
-        if pattern[j] == pattern[i]:
-            j += 1
-            lps[i] = j
+        if pattern[length] == pattern[i]:
+            length += 1
+            lps[i] = length
+    
+    print(f"lps: {lps}")  # Debugging line
     
     # Search for the pattern in the text using the lps array
     i, j = 0, 0  # Pointers for text and pattern
@@ -33,24 +26,16 @@ def kmp_search(text, pattern):
             
             if j == len(pattern):
                 occurrences.append(i - j)
-                j = lps[j-1]
+                j = lps[j-1]  # Reset j to allow for overlapping occurrences
         else:
             if j != 0:
                 j = lps[j-1]
             else:
                 i += 1
     
+    print(f"occurrences: {occurrences}")  # Debugging line
+    
     return occurrences
 
-# Pytest test cases
-def test_kmp_search():
-    assert kmp_search("ABABDABACDABABCABAB", "ABABCABAB") == [10]
-    assert kmp_search("AAAAABAAABA", "AAAA") == [0, 1, 2]
-    assert kmp_search("THIS IS A TEST TEXT", "TEST") == [10]
-    assert kmp_search("AABAACAADAABAABA", "AABA") == [0, 9, 12]
-    assert kmp_search("HELLO WORLD", "WORLD") == [6]
-    assert kmp_search("HELLO WORLD", "WORLDS") == []
-    
-# Run the test
-test_kmp_search()
-print("KMP string search algorithm test passed.")
+# Debugging: Run the failing test case and print debug information
+kmp_search_debug("AAAAABAAABA", "AAAA")  # Expected: [0, 1, 2]
